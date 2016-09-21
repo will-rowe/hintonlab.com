@@ -1,0 +1,137 @@
+{% extends "landing_page/_base.html" %}
+{% load cache %}
+{% block pagename %}RESEARCH{% endblock %}
+{% load static from staticfiles %}
+{% load thumbnail %}
+{% block scripts %}
+<script>
+/* bring up specific modal on page load (using hash value) */
+window.onload = function() {
+  var hash = window.location.hash;
+  if (hash.substring(1) == 'A') {
+    $('#research_strand_goal_A').modal('show');
+  }
+  if (hash.substring(1) == 'B') {
+    $('#research_strand_goal_B').modal('show');
+  }
+  if (hash.substring(1) == 'C') {
+    $('#research_strand_goal_C').modal('show');
+  }
+  if (hash.substring(1) == 'D') {
+    $('#research_strand_goal_D').modal('show');
+  }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+{% cache 60 research_html %}
+<!-- first section -->
+<header id="heading" class="pad-section">
+  <div class="container text-center">
+    <h1>Research</h1>
+    <h4 class="hidden-xs">Find out about the different kinds of research we do</h4>
+  </div>
+  <a class="arrow-wrap" style="cursor: pointer; cursor: hand;" onclick="$('#projects').animatescroll({scrollSpeed:2000,easing:'easeInOutBack'});"><span class="arrow"></span></a>
+</header>
+<!-- /first section -->
+
+<!-- second section - Research Statement -->
+<div id="research-statement" class="pad-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-6">
+          <div class="thumbnail">
+              <img src="{% static "img/photos/lab-collab.jpg" %}" class="img-responsive" alt="Lab and collaborators">
+              <div class="caption text-center">
+                <h4>The Hinton Lab</h4>
+                <p>Hinton Lab & Friends - 14th June 2016</p>
+              </div>
+           </div>
+      </div>
+      <div class="col-sm-6 text-center">
+        <h3>The Hinton Lab studies gene regulation, stress resistance and virulence of <i>Salmonella enterica</i> serovar Typhimurium.</h3>
+        <hr/>
+        <p class="lead">Click on the thumbnails below to find out more about the research currently being undertaken at the Hinton Lab.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /second section -->
+
+<!-- third section - Research Projects -->
+<div id="projects" class="pad-section">
+   <div class="container text-center">
+     <h2>Research Projects</h2>
+     <hr/>
+     <div class="row">
+       {% for strand in research %}
+       {% thumbnail strand.picture "450x300" crop="center" as im %}
+         <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 nopadding">
+             <div class="hovereffect" onclick="">
+                 <img class="img-responsive" src="{{ im.url }}" alt="strand research photo">
+                 <div class="overlay">
+                    <h2>{{ strand.title|slice:":40" }} . . .</h2>
+                    {% if strand.goal %}
+                    <a class="info" data-toggle="modal" data-target="#research_strand_goal_{{ strand.goal }}" style="cursor: pointer; cursor: hand;">View</a>
+                    {% else %}
+                    <a class="info" data-toggle="modal" data-target="#research_strand_{{ strand.pk }}" style="cursor: pointer; cursor: hand;">View</a>
+                    {% endif %}
+                 </div>
+             </div>
+         </div>
+       {% endthumbnail %}
+       {% endfor %}
+     </div>
+   </div>
+</div>
+<!-- /third section -->
+
+<!-- footer -->
+{% include "landing_page/footer.html" %}
+<!-- /footer -->
+
+{% endcache %}
+{% endblock content %}
+
+{% block modal %}
+<!-- RESEARCH MODAL -->
+{% for strand in research %}
+{% if strand.goal %}
+<div id="research_strand_goal_{{ strand.goal }}" class="modal fade">
+{% else %}
+<div id="research_strand_{{ strand.pk }}" class="modal fade">
+{% endif %}
+  <div class="modal-dialog modal-md">
+    <div class="modal-content text-center">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h3 class="modal-title" style="color: #558C89;">{{ strand.title }}</h3>
+        </div>
+        <div class="modal-body">
+              <well>{{ strand.text|linebreaks }}</well>
+              <hr/>
+              <div class="thumbnail">
+                  {% thumbnail strand.picture "450x300" crop="center" as im %}
+                  <img class="img-responsive img-rounded center-block" src="{{ im.url }}" alt="">
+                  {% endthumbnail %}
+                  <div class="caption">
+                      <p>{{ strand.picture_tag|linebreaks }}</p>
+                  </div>
+              </div>
+        </div>
+        <div class="modal-footer">
+            <div class="col-sm-4 text-center">
+                <p>Contact: <a href="mailto:{{ strand.user.email }}">{{ strand.user.first_name }} {{ strand.user.last_name }}</a></p>
+            </div>
+            <div class="col-sm-4 col-sm-offset-4 text-center">
+                <p>Updated: {{ strand.upload_date }}</p>
+            </div>
+        </div>
+
+    </div>
+  </div>
+</div>
+<!-- /.MODAL-->
+{% endfor %}
+{% endblock modal %}

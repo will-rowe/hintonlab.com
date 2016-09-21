@@ -1,0 +1,233 @@
+{% extends "landing_page/_base.html" %}
+{% load static from staticfiles %}
+
+{% block content %}
+<!-- Header -->
+<header id="heading" class="pad-section">
+  <div class="container text-center">
+		<!-- ToDo list -->
+		{% ifequal list_slug "mine" %}
+				<h1>Tasks assigned to {{ request.user }}</h1>
+		{% else %}
+				{% ifequal auth_ok 1 %}
+					 <h1>Tasks filed under "{{ list.name }}"</h1>
+					 <h3 style="color:white;">This task list belongs to &rarr; <i>{{ list.group }}</i></h3>
+				{% endifequal %}
+		{% endifequal %}
+  </div>
+</header>
+<!-- /Header-->
+
+<!-- Content -->
+<div class="content-section-b">
+  <div class="container">
+    <!-- Site messages (for todo lists) -->
+    {% if messages %}
+        {% for message in messages %}
+          <div {% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %}>
+              <a href="#" class="close" data-dismiss="alert">&times;</a>
+              <strong>{{ message }}</strong>
+          </div>
+        {% endfor %}
+    {% endif %}
+
+    {% ifequal auth_ok 1 %}
+        <form action="" method="POST">
+        {% csrf_token %}
+
+   {# Only show task adder if viewing a proper list #}
+   {% ifnotequal list_slug "mine" %}
+
+   <div class="row">
+     <div class="col-lg-2">
+     </div>
+     <div class="col-lg-8 text-center">
+       <div class="panel panel-primary">
+            <div class="content-box-header panel-heading">
+               <h3 class="panel-title"><i class="fa fa-magnet"></i> Control Panel</h3>
+           </div>
+           <div class="panel-body">
+               <a href="mailto:will.rowe@liverpool.ac.uk?Subject=bioinformatics-admin" target="_top" class="btn btn-default btn-md pull-center hvr-fade"> Email Will </a>
+               <a href="{% url 'todo-completed_tasks' list_id list_slug %}" class="btn btn-default btn-md pull-center hvr-fade"> View completed tasks </a>
+               <a href="{% url 'todo-lists' %}" class="btn btn-default btn-md pull-center hvr-fade"> Back to task lists </a>
+               {% ifequal can_del 1 %}
+               {% ifnotequal list_slug "mine" %}
+               <a href="{% url 'todo-del_list' list_id list_slug %}" class="btn btn-danger btn-md pull-center"> Delete task list </a>
+               {% endifnotequal %}
+               {% endifequal %}
+
+               <a class="btn btn-success btn-md pull-center" id="slideToggle"> Add a new task <span class="caret"></span></a>
+               <div id="AddTask">
+                 <br>
+            	    <table class="table">
+                    {% if form.errors %}
+                    <p><strong>Submission error:</strong></p>
+                    <p>{{form.errors}}</p>
+                    {% endif %}
+            	       <tr>
+            	           <td><label for="id_title">Task name:</label> {{ form.title }}</td>
+                     </tr>
+                     <tr>
+            	           <td><label for="id_due_date">Due date:</label> {{ form.due_date }}</td>
+                     </tr>
+                     <tr>
+            	           <td><label for="id_assigned">Assign to:</label> {{ form.assigned_to }}</td>
+                     </tr>
+            	       <tr>
+            	           <td><label for="id_note">Additional task information:</label>
+                                {{ form.note }}
+            	               <p class="minor"> An email notification will be sent if the task is assigned to someone besides yourself.</p>
+            	           </td>
+             	       </tr>
+            	    </table>
+                    <input type="hidden" name="priority" value="999" id="id_priority">
+                    <input type="hidden" name="id_notify" value="1" id="notify">
+                    <input type="hidden" name="created_by" value="{{ request.user.id }}" id="id_created_by">
+                    <input type="hidden" name="list" value="{{ list.id }}" id="id_list">
+                    <input type="hidden" name="created_date" value="{{ created_date }}" id="id_created_date">
+                  <p><input type="submit" name="add_task" value="Submit task!" class="btn btn-default btn-md pull-center hvr-fade"></p>
+                </div>
+                {% endifnotequal %}
+                {% ifequal view_completed 0  %}
+           </div>
+       </div>
+     </div>
+  </div>
+
+
+  <div class="row">
+         <div class="col-lg-12 text-center">
+           <p>
+           <p>This list is in ranked order - drag a task further up the list to increase its priority!</p>
+           <br>
+        </div>
+  </div>
+
+
+
+
+  <div class="container">
+    <table class="table table-hover" id="tasktable">
+      <thead>
+        <tr>
+            <th>Task title</th>
+            <th style="text-align:center;">Submitted on</th>
+            <th style="text-align:center;">Submitted by</th>
+            <th style="text-align:center;">Due on</th>
+            {% ifequal list_slug "mine" %}
+              <th style="text-align:center;">List</th>
+            {% else %}
+              <th style="text-align:center;">Assigned to</th>
+            {% endifequal %}
+            <th style="text-align:center;">Comments</th>
+            <th style="text-align:center;">Mark done</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for task in task_list %}
+    	        <tr id="{{ task.id }}">
+    	            <td><a href="{% url 'todo-task_detail' task.id %}">{{ task.title|slice:":20" }}. . .</a></td>
+    	            <td style="text-align:center;">{{ task.created_date|date:"d/m/Y" }}</td>
+                  <td style="text-align:center;">{{ task.created_by.first_name }} {{ task.created_by.last_name }}</td>
+    	            <td style="text-align:center;">
+    	            {% if task.overdue_status %}<span class="overdue">{% endif %}
+    	                {{ task.due_date|date:"d/m/Y" }}
+    	            {% if task.overdue_status %}</span>{% endif %}
+    	            </td>
+                  {% ifequal list_slug "mine" %}
+                    <td><a href="{% url 'todo-incomplete_tasks' task.list.id task.list.slug %}">{{ task.list }}</a></td>
+                  {% else %}
+    	               <td style="text-align:center;">{{ task.assigned_to.first_name }} {{ task.assigned_to.last_name }}</td>
+                  {% endifequal %}
+    	            <td style="text-align:center;">{% ifnotequal task.comment_set.all.count 0  %}{{ task.comment_set.all.count }}{% else %}0{% endifnotequal %}</td>
+    	            <td style="text-align:center;"><input type="checkbox" name="mark_done" value="{{ task.id }}" id="mark_done_{{ task.id }}"></td>
+                </tr>
+    	    {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+
+
+    <div class="row">
+           <div class="col-lg-12 text-center">
+             <p><input type="submit" name="mark_tasks_done" value="Update task table" class="todo-button"></p>
+          </div>
+    </div>
+
+
+    {% endifequal %}
+
+
+
+
+
+    {% ifequal view_completed 1 %}
+	<h3>Completed tasks</h3>
+    <table class="table table-hover" id="tasktable">
+        <tr>
+            <th style="text-align:center;">Task</th>
+            <th style="text-align:center;">Created</th>
+            <th style="text-align:center;">Completed on</th>
+            <th style="text-align:center;">Undo</th>
+        </tr>
+		{% for task in completed_list %}
+	        <tr>
+	            <td><a href="{% url 'todo-task_detail' task.id %}">{{ task.title|truncatewords:20 }}</a></td>
+	            <td>{{ task.created_date|date:"d/m/Y" }}</td>
+	            <td>{{ task.completed_date|date:"d/m/Y" }}</td>
+	            <td><input type="checkbox" name="undo_completed_task" value="{{ task.id }}" id="id_undo_completed_task{{ task.id }}">   </td>
+            </tr>
+	    {% endfor %}
+	</table>
+	<p><input type="submit" name="deldonetasks" value="Update this table"  class="todo-button"></p>
+	</form>
+    <p><a  class="todo" href="{% url 'todo-incomplete_tasks' list_id list_slug %}">Back to task list</a></p>
+    {% endifequal %}
+
+    {% endifequal %}
+
+  </div>
+</div>
+
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/flick/jquery-ui.css" />
+
+<!-- CSS and JavaScript for django-todo -->
+<script type="text/javascript" charset="utf-8">
+    // thedate.x comes from the edit_task view. If this is a new entry,
+    // thedate won't be present and datepicker will fall back on the default (today).
+    $(document).ready(function(){
+        $('#id_due_date').datepicker({ dateFormat: 'dd/mm/yy' });
+     });
+</script>
+
+<script type="text/javascript">
+    function order_tasks(data) {
+        // The JQuery plugin tableDnD provides a serialize() function which provides the re-ordered
+        // data in a list. We pass that list as an object called "data" to a Django view
+        // to save the re-ordered data into the database.
+        $.post("{% url 'todo-reorder_tasks' %}", data, "json");
+        return false;
+    };
+    $(document).ready(function() {
+        // Initialise the task table for drag/drop re-ordering
+        $("#tasktable").tableDnD();
+        $('#tasktable').tableDnD({
+            onDrop: function(table, row) {
+                order_tasks($.tableDnD.serialize());
+            }
+        });
+        // Initially hide the Add Task form
+        $('#AddTask').hide();
+        // toggle slide to show the Add Task form when link clicked
+        $('#slideToggle').click(function(){
+            $(this).siblings('#AddTask').slideToggle();
+        });
+    });
+</script>
+
+
+{% endblock %}

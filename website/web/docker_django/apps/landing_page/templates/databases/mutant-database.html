@@ -1,0 +1,71 @@
+{% extends "landing_page/_base.html" %}
+{% block pagename %}MUTANT-DB{% endblock %}
+{% block content %}
+{% load static from staticfiles %}
+
+<!-- Header -->
+<header id="heading" class="pad-section">
+  <div class="container text-center">
+    <h1>Mutant Collection</h1>
+    <h4 class="hidden-xs">The Hinton Lab mutant collection - please use the DropBox sheet to update the DB.</h4>
+  </div>
+  <a class="arrow-wrap" style="cursor: pointer; cursor: hand;" onclick="$('#db-table').animatescroll({scrollSpeed:2000,easing:'easeInOutBack'});"><span class="arrow"></span></a>
+</header>
+<!-- /Header-->
+
+
+<!-- Content -->
+<div class="content-section-a">
+<div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <form id="custom-search-form" class="form-search form-horizontal pull-right" action="{% url 'MUTANT-search' %}" method="get">
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="Search mutant collection . . ." name="q" value="{{request.GET.q}}">
+            <span class="input-group-btn">
+              <button class="btn btn-default hvr-fade" value="Search" type="submit">Search!</button>
+            </span>
+          </div><!-- /input-group -->
+        </form>
+      </div><!-- /.col-lg-6 -->
+    </div><!-- /.row -->
+</div>
+</div>
+
+
+<!-- Content -->
+<div id="db-table" class="content-section-b">
+    <div class="container">
+        <div class="row">
+            <table class="sortable table table-hover">
+              <thead>
+                <tr>
+                  <th>Location Identifier</th>
+                  <th>Collection</th>
+                  <th>Genotype</th>
+                  <th>Construction Details</th>
+                  <th>Growth Conditions</th>
+                  <th>Group</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for mutant in all_mutants %}
+                <tr>
+                  <td>{{ mutant.LOCATION_IDENTIFIER }}</td>
+                  <td>{{ mutant.COLLECTION_NUMBER }}</td>
+                  <td>{{ mutant.GENOTYPE }}</td>
+                  <td>{{ mutant.CONSTRUCTION_DETAILS }}</td>
+                  <td>{{ mutant.GROWTH_CONDITIONS }}</td>
+                  <td>{{ mutant.GROUP }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- /.container -->
+</div>
+<!-- /.content-section-b -->
+
+
+{% endblock content %}

@@ -1,0 +1,48 @@
+{% extends "landing_page/_base.html" %}
+{% load static from staticfiles %}
+
+{% block content %}
+<!-- Content -->
+<div class="content-section-a">
+  <div class="container">
+
+
+    {# Only admins can delete lists. #}
+    {% ifequal can_del 1 %}
+
+        {% if list_killed %}
+           <h2> The list "{{ list.name }}" has been deleted.</h2>
+            <a href="{% url 'todo-lists' %}">Return to lists</a>
+        {% else %}
+
+            <h2>Delete the entire list: {{ list.name }} ?</h2>
+
+            <p>Category tally:</p>
+
+             <ul>
+                <li>Incomplete: {{ item_count_undone }} </li>
+                <li>Complete: {{ item_count_done }} </li>
+                <li><strong>Total: {{ item_count_total }}</strong> </li>
+             </ul>
+
+            <form action="" method="post" accept-charset="utf-8">
+    		{% csrf_token %}
+
+                <input type="hidden" name="list" value="{{ list.id }}" id="some_name">
+             <p><input type="submit" name="delete-confirm" value="Confirm delete" class="btn btn-danger btn-md pull-center"> </p>
+            </form>
+
+
+            <a href="{% url 'todo-incomplete_tasks' list.id list_slug %}">Return to list: {{ list.name }}</a>
+
+        {% endif %}
+
+
+    {% else %}
+
+        <p>Sorry, you don't have permission to delete lists. Please contact your group administrator.</p>
+
+    {% endifequal %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends "landing_page/_base.html" %}
+
+
+{% block content %}
+
+<!-- Banner -->
+<a  name="Reading List"></a>
+<div class="banner">
+    <div class="container">
+        <div class="row">
+          <a href="{% url 'mutant-database' %}" class="btn btn-default btn-lg pull-right hvr-fade" role="button"><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>&nbsp; Return to collection</a>
+          <h1>Strain Collection</h1>
+        </div>
+    </div>
+    <!-- /.container -->
+</div>
+<!-- /.banner -->
+
+<!-- Content -->
+<div class="content-section-a">
+    <div class="container">
+        <div class="row">
+            <h3>Search results <small>(query: {{ query }})</small></h3>
+            {% if search_results %}
+            <div class="container">
+                <div class="row">
+                    <table class="sortable table table-hover">
+                      <thead>
+                        <tr>
+                          <th>Location Identifier</th>
+                          <th>Collection</th>
+                          <th>Genotype</th>
+                          <th>Construction Details</th>
+                          <th>Growth Conditions</th>
+                          <th>Group</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+            {% for result in search_results %}
+                        <tr>
+                          <td>{{ result.LOCATION_IDENTIFIER }}</td>
+                          <td>{{ result.COLLECTION_NUMBER }}</td>
+                          <td>{{ result.GENOTYPE }}</td>
+                          <td>{{ result.CONSTRUCTION_DETAILS }}</td>
+                          <td>{{ result.GROWTH_CONDITIONS }}</td>
+                          <td>{{ result.GROUP }}</td>
+                        </tr>
+            {% endfor %}
+                      </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- /.container -->
+
+            {% else %}
+              <p>No matches in database using search query: {{ query }}</p>
+            {% endif %}
+
+
+
+
+
+
+
+
+        </div>
+    </div>
+    <!-- /.container -->
+</div>
+<!-- /.content-section-a -->
+
+
+
+
+{% endblock content %}

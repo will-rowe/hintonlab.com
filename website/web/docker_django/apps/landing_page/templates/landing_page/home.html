@@ -1,0 +1,238 @@
+{% extends "landing_page/_base.html" %}
+{% load cache %}
+{% block pagename %}HOME-PAGE{% endblock %}
+{% load static from staticfiles %}
+{% load thumbnail %}
+
+{% block scripts %}
+        <script src="{% static "js/google-map.js" %}"></script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBge84-8mtk5do_yRwlWm3ciLoAasR44D4&callback=initMap" async defer></script>
+        <script src="{% static "js/owl.carousel.min.js" %}"></script>
+        <script>
+        $(document).ready(function() {
+          $("#owl-demo").owlCarousel({
+              autoPlay: 4000, //Set AutoPlay to 4 seconds
+              stopOnHover: true,
+              items : 3,
+              itemsCustom : false,
+              itemsDesktop : [1199,3],
+              itemsDesktopSmall : [980,3],
+              itemsTablet: [768,2],
+              itemsTabletSmall: false,
+              itemsMobile : [479,1],
+              singleItem : false,
+              itemsScaleUp : false,
+          });
+        });
+        </script>
+{% endblock scripts %}
+
+{% block content %}
+      {% if response %}
+      <!-- messages -->
+      <div class="alert alert-info" role="alert">
+      	<button type="button" class="close" data-dismiss="alert">×</button>
+      	{{ response | safe }}
+      </div>
+      <!-- ./messages -->
+      {% endif %}
+
+{% cache 600 home_html %}
+      <!-- first section - Home -->
+       <div id="home">
+         <div class="col-md-6">
+            <div class="svg-animation wobble"><a>{% include "landing_page/logo-animation.svg" %}</a></div>
+         </div>
+         <div class="col-md-6 hidden-sm hidden-xs">
+            <div class="svg-animation fade-in three">{% include "landing_page/tag-line.svg" %}</div>
+         </div>
+         <a class="arrow-wrap" style="cursor: pointer; cursor: hand;" onclick="$('#goals').animatescroll({scrollSpeed:2000,easing:'easeInOutBack'});"><span class="arrow"></span></a>
+       </div>
+       <!-- ./first section -->
+
+       <!-- second section - Research Statement -->
+       <div id="research-statement" class="pad-section">
+         <div class="container">
+           <div class="row">
+             <div class="col-sm-6">
+                 <div class="thumbnail">
+                     <img src="{% static "img/photos/jay-hinton.jpg" %}" class="img-responsive" alt="Jay Hinton">
+                     <div class="caption text-center">
+                       <h4>Professor Jay Hinton</h4>
+                       <p>Professor of Microbial Pathogenesis</p>
+                     </div>
+                  </div>
+             </div>
+             <div class="col-sm-6 text-center">
+               <h3>"Our Wellcome Trust Investigator project is focused on discovering the virulence factors used by novel clades of <i>S. Typhimurium</i> and <i>S. Enteritidis</i> to cause disease in Africa."</h3>
+               <hr/>
+               <p class="lead">The underlying theme of our current research is to understand the intricate interplay of gene expression that leads to bacterial infection and pave the way for new antibiotics and vaccines.</p>
+             </div>
+           </div>
+         </div>
+       </div>
+       <!-- ./second section -->
+
+       <!-- third section - Goals -->
+       <div id="goals" class="pad-section">
+         <div class="container">
+           <h2 class="text-center">Research Questions</h2> <hr/>
+           <div class="row text-center">
+             <div class="col-sm-3 col-xs-12">
+               <a style="cursor: pointer; cursor: hand;" href="{% url 'research' %}#A"><i class="goals goal-1"></i></a>
+               <h4>Genomics</h4>
+               <p>Using comparative genomics to understand evolution of epidemic <i>Salmonella</i></p><br/>
+             </div>
+             <div class="col-sm-3 col-xs-12">
+               <a style="cursor: pointer; cursor: hand;" href="{% url 'research' %}#B"><i class="goals goal-2"></i></a>
+               <h4>Gene Expression</h4>
+               <p>Regulation of expression of <i>Salmonella</i> virulence factors</p><br/>
+             </div>
+             <div class="col-sm-3 col-xs-12">
+               <a style="cursor: pointer; cursor: hand;" href="{% url 'research' %}#C"><i class="goals goal-3"></i></a>
+               <h4>Metabolism</h4>
+               <p>Do epidemic <i>Salmonella</i> strains prefer particular carbon sources during intracellular infection?</p><br/>
+             </div>
+             <div class="col-sm-3 col-xs-12">
+               <a style="cursor: pointer; cursor: hand;" href="{% url 'research' %}#D"><i class="goals goal-4"></i></a>
+               <h4>Virulence & Infection</h4>
+               <p>How do epidemic <i>Salmonella</i> strains cause disease?</p>
+             </div>
+           </div>
+         </div>
+       </div>
+       <!-- ./third section -->
+
+       <!-- fourth section - Information -->
+       <div id="information" class="pad-section">
+          <div class="container">
+            <div id="owl-demo">
+              {% for item in carousel %}
+              {% thumbnail item.picture "450x300" crop="center" as im %}
+              <div class="item">
+                <div class="thumbnail fff">
+                  <a href="{{ item.link }}" target="_blank">
+                  <img src="{{ im.url }}" alt="carousel img">
+                  <div class="caption">
+                      <h4>{{ item.title }}</h4>
+                      <p>{{ item.text }}</p>
+                  </div>
+                  </a>
+                </div>
+              </div>
+              {% endthumbnail %}
+              {% endfor %}
+            </div>
+          </div>
+       </div>
+       <!-- ./fourth section -->
+
+       <!-- fifth section -->
+       <div id="contact-us" class="pad-section">
+         <div class="container">
+           <h2 class="text-center">Contact</h2> <hr/>
+           <div class="row text-center">
+             <div class="col-sm-3 col-xs-12">
+               <a style="cursor: pointer; cursor: hand;" class="info" data-toggle="modal" data-target="#lab-query-modal"><i class="glyphicon glyphicon-envelope"></i></a>
+               <h4>Contact The Lab</h4>
+               <p>Drop the lab an email by using the link above!</p><br/>
+             </div>
+             <div class="col-sm-3 col-xs-12">
+               <a style="cursor: pointer; cursor: hand;" href="https://www.liverpool.ac.uk/maps/visiting/" target="_blank"><i class="glyphicon glyphicon-search"></i></a>
+               <h4>Find Us</h4>
+               <p>Click above for directions to the IIB, or see the map below.</p><br/>
+             </div>
+             <div class="col-sm-3 col-xs-12">
+               <a style="cursor: pointer; cursor: hand;" class="info" data-toggle="modal" data-target="#webmaster-modal"><i class="glyphicon glyphicon-globe"></i></a>
+               <h4>Contact Webmaster</h4>
+               <p>Please get in touch with website feedback and suggestions.</p>
+             </div>
+             <div class="col-sm-3 col-xs-12">
+               <a style="cursor: pointer; cursor: hand;" href="https://twitter.com/jay_salsa" target="_blank"><i class="glyphicon glyphicon-share-alt"></i></a>
+               <h4>Follow Us</h4>
+               <p>Follow Jay Hinton on Twitter</p><br/>
+             </div>
+           </div>
+         </div>
+       </div>
+       <!-- ./fifth section -->
+
+       <!-- google map -->
+       <div id="google_map"></div>
+       <!-- ./google map -->
+
+       <!-- cityscape footer -->
+       <div id="bottom_pad" class="pad-section">
+         <div id="footer-section">
+           <div class="footer-city"></div>
+         </div>
+         <div class="navbar navbar-default navbar-fixed-bottom">
+           <div class="container">
+             <p class="navbar-text pull-right">© 2016 - The Hinton Lab</p>
+           </div>
+         </div>
+       </div>
+       <!-- ./footer -->
+
+{% endcache %}
+{% endblock content %}
+
+{% block modal %}
+<!-- LAB QUERY MODAL -->
+<div id="lab-query-modal" class="modal fade">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h3 id="myModalLabel">Get in touch with the lab!</h3>
+        </div>
+        <div class="modal-body">
+          <form class="form-horizontal col-sm-12" id="message-form" method="post" action="/">{% csrf_token %}
+            {% if form.errors %}
+            <div class="alert alert-danger">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>Error:</strong>
+                {{ form.errors }}
+            </div>
+            {% endif %}
+            <div class="form-group"><label>Email</label><input class="form-control required" placeholder="Your email address" id="from_email" name="from_email" type="email"></div>
+            <div class="form-group"><label>Message</label><textarea class="form-control" placeholder="Please enter your message here.." id="message" name="message"></textarea></div>
+            <div class="form-group"><button type="submit" class="btn btn-success pull-right">Send!</button> <p class="help-block pull-left text-danger hide" id="form-error">&nbsp; The form is not valid. </p></div>
+            <input type="hidden" name="subject" id="subject" value="Hinton Lab Website: general enquiry received - {% now "jS F Y H:i" %}"/>
+            <input type="hidden" name="next" value="{% url 'landing_page' %}"/>
+          </form>
+        </div>
+    </div>
+  </div>
+<!-- ./LAB QUERY MODAL-->
+</div>
+
+<!-- WEBMASTER MODAL -->
+<div id="webmaster-modal" class="modal fade">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h3 id="myModalLabel">Contact the webmaster</h3>
+        </div>
+        <div class="modal-body">
+          <form class="form-horizontal col-sm-12" id="message-form" method="post" action="/">{% csrf_token %}
+            {% if form.errors %}
+            <div class="alert alert-danger">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>Error:</strong>
+                {{ form.errors }}
+            </div>
+            {% endif %}
+            <div class="form-group"><label>Email</label><input class="form-control required" placeholder="Your email address" id="from_email" name="from_email" type="email"></div>
+            <div class="form-group"><label>Message</label><textarea class="form-control" placeholder="Please enter your message here.." id="message" name="message"></textarea></div>
+            <div class="form-group"><button type="submit" class="btn btn-success pull-right">Send!</button> <p class="help-block pull-left text-danger hide" id="form-error">&nbsp; The form is not valid. </p></div>
+            <input type="hidden" name="subject" id="subject" value="Hinton Lab Website: WEBMASTER enquiry received - {% now "jS F Y H:i" %}"/>
+            <input type="hidden" name="next" value="{% url 'landing_page' %}"/>
+          </form>
+        </div>
+    </div>
+  </div>
+<!-- ./WEBMASTER MODAL-->
+</div>
+{% endblock modal %}

@@ -1,0 +1,93 @@
+{% extends "landing_page/_base.html" %}
+{% block pagename %}NEWS{% endblock %}
+{% load static from staticfiles %}
+{% load thumbnail %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+<!--- Post List --->
+      <div id="news-content" class="col-md-8">
+        <div class="entry-title">
+          <h2>Recent News</h2>
+          {% if user.is_authenticated %}<a href="{% url 'post_new' %}" class="btn btn-default btn-xs pull-right hvr-fade" role="button"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New post</a>{% endif %}
+          <hr/>
+        </div>
+        {% for post in posts %}
+        <article>
+          <div class="art-header">
+            <h3><a href="{% url 'post_detail' pk=post.pk %}">{{ post.title }}</a></h3>
+            <div class="info">By <a href="{% url 'the_team' %}">{{ post.author.first_name }} {{ post.author.last_name }}</a> on {{ post.published_date }}</div>
+          </div>
+          <div class="art-content">
+            {% thumbnail post.picture "600x300" crop="center" as im %}
+                <img class="img-responsive img-rounded center-block" src="{{ im.url }}" alt="http://placehold.it/600x300">
+                {% endthumbnail %}
+            <hr/>
+            <p>{{ post.text|slice:":400"|safe|urlize|linebreaks }} . . .</p>
+             <a href="{% url 'post_detail' pk=post.pk %}" class="btn btn-default hvr-fade">Read More</a>
+             <hr>
+          </div>
+        </article>
+        {% endfor %}
+<!--- ./ Post List --->
+      </div>
+
+<!--- Side Bar --->
+      <div id="news-sidebar" class="col-md-4">
+            <!--- search --->
+            <div class="widget wid-search">
+              <div class="heading"><h4>Search</h4></div>
+                <div class="content">
+                  <form id="custom-search-form" class="form-search form-horizontal pull-right" action="{% url 'news_search' %}" method="get">
+                      <div class="input-group">
+                          <input type="text" class="form-control" placeholder="Search news . . ." name="q" value="{{request.GET.q}}">
+                          <span class="input-group-btn">
+                              <button class="btn btn-default" type="submit" value="search">
+                                  <span class="glyphicon glyphicon-search"></span>
+                          </button>
+                          </span>
+                      </div>
+                  </form>
+                </div>
+            <!--- ./ search --->
+            </div>
+            <!--- category --->
+            <div class="widget wid-category">
+              <div class="heading"><h4>Categories</h4></div>
+              <div class="content text-center">
+                  <div class="col-xs-3">
+                    <a class="btn btn-default btn-md hvr-fade" role="button" href="{% url 'lab_news' %}">Lab</a>
+                  </div>
+                  <div class="col-xs-3">
+                    <a class="btn btn-default btn-md hvr-fade" role="button" href="{% url 'social_news' %}">Social</a>
+                  </div>
+                  <div class="col-xs-3">
+                    <a class="btn btn-default btn-md hvr-fade" role="button" href="{% url 'other_news' %}">Other</a>
+                  </div>
+                  <div class="col-xs-3">
+                    <a class="btn btn-default btn-md hvr-fade" role="button" href="{% url 'news' %}">All</a>
+                  </div>
+              </div>
+            <!--- ./ categories --->
+            </div>
+            <!--- twitter --->
+            <div class="widget wid-about">
+              <div class="heading"><h4>Connect</h4></div>
+              <div class="content">
+                <a class="twitter-timeline" href="https://twitter.com/jay_salsa" data-widget-id="722041337470705664"></a>
+                <div class="addthis_horizontal_follow_toolbox"></div>
+              </div>
+              <!--- ./ twitter --->
+            </div>
+<!--- ./ Side Bar --->
+      </div>
+    </div>
+    <hr>
+</div>
+
+<!-- footer -->
+{% include "landing_page/footer.html" %}
+<!-- /footer -->
+
+{% endblock content %}

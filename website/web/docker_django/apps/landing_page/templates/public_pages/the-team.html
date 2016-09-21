@@ -1,0 +1,161 @@
+{% extends "landing_page/_base.html" %}
+{% load cache %}
+{% block pagename %}THE-TEAM{% endblock %}
+{% load static from staticfiles %}
+{% load thumbnail %}
+
+{% block content %}
+{% cache 60 team_html %}
+<!-- first section -->
+<header id="heading" class="pad-section">
+  <div class="container text-center">
+    <h1>The Hinton Lab</h1>
+    <h4 class="hidden-xs">Find out about our past and present lab members, as well as our collaborators</h4>
+  </div>
+  <a class="arrow-wrap" style="cursor: pointer; cursor: hand;" onclick="$('#team-profiles').animatescroll({scrollSpeed:2000,easing:'easeInOutBack'});"><span class="arrow"></span></a>
+</header>
+<!-- /first section -->
+
+<!-- second section - Team Statement -->
+<div id="research-statement" class="pad-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-6">
+          <div class="thumbnail">
+              <img src="{% static "img/photos/lab-photo-may-16.png" %}" class="img-responsive" alt="Team">
+              <div class="caption text-center">
+                <h4>The Team</h4>
+                <p>06.05.2016</p>
+              </div>
+           </div>
+      </div>
+      <div class="col-sm-6 text-center">
+        <h3>The Hinton Lab currently has {{ team|length }} members in the team.</h3>
+        <hr/>
+        <h4>Click on the photos below to find out more about them or to get their contact details.</h4>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /second section -->
+
+<!-- third section - Profiles -->
+<div id="team-profiles" class="pad-section">
+  <div class="container text-center">
+    <h2>The Team</h2>
+    <hr/>
+    <div class="row">
+      {% for member in team %}
+      {% thumbnail member.userprofile.picture "450x300" crop="center" as im %}
+        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 nopadding">
+            <div class="hovereffect">
+                <img class="img-responsive" src="{{ im.url }}" alt="Member Photo">
+                <div class="overlay">
+                   <h2>{{ member.userprofile.user.first_name }} {{ member.userprofile.user.last_name }}</h2>
+                   <a class="info" data-toggle="modal" data-target="#{{ member.pk }}" style="cursor: pointer; cursor: hand;">View bio</a>
+                </div>
+            </div>
+        </div>
+      {% endthumbnail %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+<!-- /third section -->
+
+
+{% if collaborators %}
+<!-- fourth section - Collaborators -->
+<div id="team-profiles" class="pad-section">
+  <div class="container text-center">
+    <h2>Collaborators</h2>
+    <hr/>
+    <div class="row">
+      {% for member in collaborators %}
+      {% thumbnail member.userprofile.picture "450x300" crop="center" as im %}
+        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 nopadding">
+            <div class="hovereffect">
+                <img class="img-responsive" src="{{ im.url }}" alt="Member Photo">
+                <div class="overlay">
+                   <h2>{{ member.userprofile.user.first_name }} {{ member.userprofile.user.last_name }}</h2>
+                   <a class="info" data-toggle="modal" data-target="#{{ member.pk }}" style="cursor: pointer; cursor: hand;">View bio</a>
+                </div>
+            </div>
+        </div>
+      {% endthumbnail %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+<!-- /fourth section -->
+{% endif %}
+
+
+<!-- footer -->
+{% include "landing_page/footer.html" %}
+<!-- /footer -->
+
+{% endcache %}
+{% endblock content %}
+
+{% block modal %}
+<!-- TEAM MODAL -->
+{% for member in team %}
+<div id="{{ member.pk }}" class="modal fade">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h2 class="modal-title" style="color: #558C89;">{{ member.userprofile.user.first_name }} {{ member.userprofile.user.last_name }} <small>- {{ member.userprofile.position }}</small></h2>
+        </div>
+        <div class="modal-body">
+              <div class="col-md-6">
+                <h3>Biography</h3>
+                <well>{{ member.userprofile.bio|linebreaks }}</well>
+              </div>
+              <div class="col-md-6 text-center">
+                {% thumbnail member.userprofile.picture "300x300" crop="center" as im %}
+                <img class="img-responsive center-block" src="{{ im.url }}" alt="">
+                {% endthumbnail %}
+                <hr/>
+                <p>Email: <a href="mailto:{{ member.userprofile.user.email }}" target="_blank">{{ member.userprofile.user.email }}</a></p>
+              </div>
+            <hr/>
+        </div>
+    </div>
+  </div>
+</div>
+<!-- /.TEAM MODAL-->
+{% endfor %}
+
+{% if collaborators %}
+<!-- COLLABORATOR MODAL -->
+{% for member in collaborators %}
+<div id="{{ member.pk }}" class="modal fade">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h2 class="modal-title" style="color: #558C89;">{{ member.userprofile.user.first_name }} {{ member.userprofile.user.last_name }} <small>- {{ member.userprofile.position }}</small></h2>
+        </div>
+        <div class="modal-body">
+              <div class="col-md-6">
+                <h3>Biography</h3>
+                <well>{{ member.userprofile.bio|linebreaks }}</well>
+              </div>
+              <div class="col-md-6 text-center">
+                {% thumbnail member.userprofile.picture "300x300" crop="center" as im %}
+                <img class="img-responsive center-block" src="{{ im.url }}" alt="">
+                {% endthumbnail %}
+                <hr/>
+                <p>Email: <a href="mailto:{{ member.userprofile.user.email }}" target="_blank">{{ member.userprofile.user.email }}</a></p>
+              </div>
+            <hr/>
+        </div>
+    </div>
+  </div>
+</div>
+<!-- /.COLLABORATOR MODAL-->
+{% endfor %}
+{% endif %}
+{% endblock modal %}

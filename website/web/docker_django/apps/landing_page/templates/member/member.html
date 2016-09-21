@@ -1,0 +1,254 @@
+{% extends "landing_page/_base.html" %}
+{% block pagename %}MEMBER{% endblock %}
+{% load static from staticfiles %}
+{% load thumbnail %}
+{% block scripts %}
+<!-- Morris JavaScript -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
+<script src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+<script src="http://cdn.oesmith.co.uk/morris-0.4.1.min.js"></script>
+<script type="text/javascript">
+  Morris.Donut({
+    element: 'donut-bioinfo',
+    data: [
+      {% for key,value in task_lists.items %}
+        { label: "{{ key }}", value: {{value}} },
+      {% endfor %}
+    ]
+  });
+</script>
+{% endblock %}
+
+<!-- Bring up create account modal if logged in with admin account -->
+{% block modal %}
+{% if admin %}
+<!-- create account -->
+<div class="modal fade" id="profileModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+          <div class="loginmodal-container">
+          <h1>Create Your Account</h1><br>
+          <form id="user_form" method="post" action="" enctype="multipart/form-data">
+          {% csrf_token %}
+          <table class="table">
+            {% for field in form %}
+                <div class="fieldWrapper">
+                  <tr>
+                      <td><label>{{ field.label_tag }}</label></td>
+                      <td>{{ field }}</td>
+                  </tr>
+                    {% if field.errors %}
+                    <div class="alert alert-danger">
+                        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                        <strong>Error in {{ field.label_tag }}</strong>{{ field.errors }}
+                        {% if field.help_text %}{{ field.help_text|safe }}{% endif %}
+                      </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+          </table>
+                  <input type="submit" value="Create account!" class="login loginmodal-submit" />
+                  <input type="hidden" name="next" value="{% url 'member' %}"/>
+          </form>
+            <div class="login-help text-center">
+              <p><note>Once created, please log on with your new username.</note></p>
+            </div>
+          </div>
+        </div>
+<!-- /.create account-->
+</div>
+{% endif %}
+
+
+<!-- Bring up profile registration modal if no profile exists -->
+{% if register %}
+<!-- register profile -->
+<div id="profileModal" class="modal fade">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h3 id="myModalLabel">Register your profile</h3>
+        </div>
+        <div class="modal-body">
+          <form class="form-horizontal col-sm-12" id="profile_form" method="post" action="" enctype="multipart/form-data">{% csrf_token %}
+            {% if form.errors %}
+            <div class="alert alert-danger">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>Error:</strong>
+                {{ form.errors }}
+            </div>
+            {% endif %}
+            <div class="form-group"><label>Position</label><input class="form-control required" placeholder="e.g. PostDoc" id="position" name="position" type="text"></div>
+            <div class="form-group"><label>Bio</label><textarea class="form-control" placeholder="Please enter a brief biography here . . ." id="bio" name="bio"></textarea></div>
+            <div class="form-group"><label>Picture</label><input class="form-control required" id="picture" name="picture" type="file"></div>
+            <div class="form-group"><button type="submit" class="btn btn-success pull-right">Create profile!</button> <p class="help-block pull-left text-danger hide" id="form-error">&nbsp; The form is not valid. </p></div>
+            <input type="hidden" name="user" id="user" value="{{ request.user }}"/>
+            <input type="hidden" name="next" value="{% url 'member' %}"/>
+          </form>
+        </div>
+    </div>
+  </div>
+<!-- /.register profile -->
+</div>
+
+
+
+
+{% endif %}
+
+{% endblock %}
+
+<!-- Display user profile if exists -->
+{% block content %}
+{% if profile %}
+<div id="member-page">
+<!-- notifications row -->
+        <div class="row">
+          <div class="col-sm-10 col-sm-offset-1 panel-warning">
+            <div class="content-box-header panel-heading">
+              <div class="panel-title ">Welcome, {{user.first_name}}</div>
+              <div class="panel-min-control"><a data-toggle="collapse" data-target="#collapseNotifications" href="#collapseNotifications"></a></div>
+            </div>
+            <div class="content-box-large box-with-header">
+              <!--- panel collapse --->
+              <div id="collapseNotifications" class="panel-collapse collapse in">
+                <h4>Notifications:</h4>
+                {% if notifications %}
+                {% for note in notifications %}
+                  <p>{{ note.NOTIFICATION }}.</p>
+                {% endfor %}
+              {% else %}
+                  <p>No notifications to display ...</p>
+              {% endif %}
+                <hr/>
+                <h4>Upcoming lab meetings:</h4>
+                {% if next_meeting %}
+                  {% for meeting in next_meeting %}
+                    <p>{{ meeting.DATE }}: <strong>{{ meeting.SPEAKER }}</strong> is presenting at {{ meeting.TIME }} ({{ meeting.VENUE }}).</p>
+                      <ul><li>{{ meeting.TOPIC }}</li></ul>
+                  {% endfor %}
+                {% else %}
+                  <p>No lab meetings scheduled in the next 7 days.</p>
+                {% endif %}
+              <!-- /. panel collapse -->
+              </div>
+            </div>
+          </div>
+<!-- /. notifications row -->
+        </div>
+
+<!-- profile row -->
+        <div class="row">
+                  <!-- profile info -->
+                  <div class="col-sm-3 col-sm-offset-1 panel-info">
+                    <div class="content-box-header panel-heading">
+                        <div class="panel-title">My Profile</div>
+                        <div class="panel-min-control"><a data-toggle="collapse" data-target="#collapseOne" href="#collapseOne"></a></div>
+                        <div class="panel-options"><a href="{% url 'edit_profile' %}"><i class="glyphicon glyphicon-cog"></i></a></div>
+                    </div>
+                    <div class="content-box-large box-with-header">
+                      <!--- panel collapse --->
+                      <div id="collapseOne" class="panel-collapse collapse in">
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                {% thumbnail picture "380x500" crop="center" as im %}
+                                    <img class="img-responsive img-rounded center-block" src="{{ im.url }}" alt="User profile pic">
+                                    {% empty %}
+                                    <p>No profile pic!</p>
+                                    {% endthumbnail %}
+                                </div>
+                                <div class="col-lg-8">
+                                      <h3 style="color: orange;">{{ user.first_name }} {{ user.last_name }}</h3>
+                                      <small class="text-muted">Created: {{ user.date_joined }}</small>
+                                </div>
+                              </div>
+                              <hr/>
+                              <table class="table table-hover">
+                                  <tr>
+                                    <th style="border: none;">Username:</th>
+                                    <td style="border: none;">{{ user }}</td>
+                                  </tr>
+                                  <tr>
+                                    <th style="border: none;">Email:</th>
+                                    <td style="border: none;">{{ user.email }}</td>
+                                  </tr>
+                                  <tr>
+                                    <th style="border: none;">Position:</th>
+                                    <td style="border: none;">{{ position }}</td>
+                                  </tr>
+                              </table>
+                              <div class="row">
+                                <hr/>
+                                <div class="well">{{ bio|linebreaks }}</div>
+                              </div>
+                          </div>
+                    </div>
+                    <!-- /. panel collapse -->
+                    </div>
+                  <!-- /. profile info -->
+                  </div>
+
+
+
+                  <!-- tasks -->
+                  <div class="col-sm-4 panel-info">
+                    <div class="content-box-header panel-heading">
+                      <div class="panel-title">Bioinformatics</div>
+                      <div class="panel-min-control"><a data-toggle="collapse" data-target="#collapseTwo" href="#collapseTwo"></a></div>
+                      <div class="panel-options">
+                        <a href="{% url 'todo-lists' %}"><i class="glyphicon glyphicon-share-alt"></i></a>
+                      </div>
+                    </div>
+                    <div class="content-box-large box-with-header">
+                      <!--- panel collapse --->
+                      <div id="collapseTwo" class="panel-collapse collapse in">
+                        <h4>Task list overview:</h4>
+                        <div id="donut-bioinfo" style="height: 5%;"></div>
+                        <hr/>
+                        <h4>Recently completed tasks:</h4>
+                          <ul>
+                          {% if completed_tasks %}
+                            {% for task in completed_tasks|slice:":2" %}
+                              <li>{{ task }}</li>
+                            {% endfor %}
+                          {% else %}
+                              <li>No tasks have been recently completed...!</li>
+                          {% endif %}
+                          </ul>
+
+                        {% if submitted_tasks %}
+                        <h4>Your recently submitted tasks:</h4>
+                          <ul>
+                          {% for task in submitted_tasks|slice:":2" %}
+                            <li>{{ task }}</li>
+                          {% endfor %}
+                          </ul>
+                        {% endif %}
+                      <!-- /. panel collapse -->
+                      </div>
+                    </div>
+                  <!-- /. tasks -->
+                  </div>
+
+                  <!-- news -->
+                  <div class="col-sm-3 panel-info">
+                    <div class="content-box-header panel-heading panel-min-control">
+                      <div class="panel-title">News</div>
+                      <div class="panel-min-control"><a data-toggle="collapse" data-target="#collapseThree" href="#collapseThree"></a></div>
+                    </div>
+                    <div class="content-box-large box-with-header">
+                      <!--- panel collapse --->
+                      <div id="collapseThree" class="panel-collapse collapse in">
+                        <a class="twitter-timeline" href="https://twitter.com/hashtag/salmonella" data-widget-id="722042073126465536">#salmonella Tweets</a>
+                      <!-- /. panel collapse -->
+                      </div>
+                    </div>
+                  <!-- /. news -->
+                  </div>
+
+<!-- /. member container -->
+</div>
+
+{% endif %}
+{% endblock %}

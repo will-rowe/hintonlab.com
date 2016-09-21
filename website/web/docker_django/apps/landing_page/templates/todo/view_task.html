@@ -1,0 +1,161 @@
+{% extends "landing_page/_base.html" %}
+{% load static from staticfiles %}
+
+{% block content %}
+
+<!-- Header -->
+<header id="heading" class="pad-section">
+  <div class="container text-center">
+				<h1>{{ task }}</h1>
+  </div>
+</header>
+<!-- /Header-->
+
+    <!-- Content -->
+    <div class="content-section-b">
+      <div class="container">
+
+    {% ifequal auth_ok 1 %}
+    <form action="" method="POST" class="form-inline">
+    {% csrf_token %}
+
+        {% if user.is_authenticated %}<p id="slideToggle"><a class="btn btn-default pull-right hvr-fade">Edit task &nbsp;<span class="glyphicon glyphicon-pencil"></span></a></p>{% endif %}
+        <div id="TaskEdit">
+                <table class="table table-bordered" style="background-color:white">
+                    {{ form.management_form }}
+                    {{ form.id }}
+                <tr>
+                    <td>Title:</td>
+                    <td>{{ form.title }}  </td>
+                </tr>
+
+                <tr>
+                    <td>List:</td>
+                    <td>{{ form.list }}  </td>
+                </tr>
+
+                <tr>
+                    <td>Due:</td>
+                    <td>{{ form.due_date }}  </td>
+                </tr>
+
+                <tr>
+                    <td>Assigned to:</td>
+                    <td>{{ form.assigned_to }}  </td>
+                </tr>
+
+                <tr>
+                    <td valign="top">Task information:</td>
+                    <td>{{ form.note }}  </td>
+                </tr>
+
+                <tr>
+                    <td>Priority:</td>
+                    <td>{{ form.priority }}  </td>
+                </tr>
+
+                </table>
+                    <p><input class="btn btn-success btn-md pull-center" name="edit_task" type="submit" value="Confirm edit!"</p>
+        <hr />
+        </div>
+
+
+        <p><strong>This task belongs to the following list:</strong></p>
+        <ul>
+          <li><a href="{% url 'todo-incomplete_tasks' task.list.id task.list.slug %}" class="showlink">{{ task.list }}</a></li>
+        </ul>
+        <hr />
+        <p><strong>Task information:</strong></p>
+        <table class="table table-bordered" style="background-color:white">
+        <tr>
+            <th>Assigned to</th>
+            <th>Created by</th>
+            <th>Due date</th>
+        </tr>
+        <tr>
+            <td>{{ task.assigned_to }}</td>
+            <td>{{ task.created_by }}</td>
+            <td>{{ task.due_date }}</td>
+        </tr>
+        </table>
+
+        {% if task.note %}
+        <pre>{{ task.note|safe|urlize|linebreaks }}</pre>
+        {% endif %}
+
+        <hr />
+
+        <div class="row">
+          <div class="col-lg-2">
+          </div>
+          <div class="col-lg-8 text-center">
+            <div class="panel panel-primary">
+                <div class="content-box-header panel-heading">
+                    <h3 class="panel-title"><i class="fa fa-magnet"></i> Comments </h3>
+                </div>
+                <div class="panel-body">
+
+                  {% for comment in comment_list %}
+                      {% if comment.author|stringformat:"s" == "will.rowe"  %}
+                        <p style="color:#aaa;font-family:verdana;font-size:11px;"><mark style="background-color:yellow;">{{ comment.author }}</mark> on {{ comment.date|date:"F d Y P" }}</p>
+                        <p>{{ comment.body|safe|urlize|linebreaks }}</p>
+                        <hr />
+                      {% else %}
+                      <p style="color:#aaa;font-family:verdana;font-size:11px;">{{ comment.author }} on {{ comment.date|date:"F d Y P" }}</p>
+                      <p>{{ comment.body|safe|urlize|linebreaks }}</p>
+                      <hr />
+
+                      {% endif %}
+
+                  {% empty %}
+                  <p>Currently there are no comments on this task</p>
+                  {% endfor %}
+
+                <div class="panel-body">
+
+                <textarea class="form-control" rows="2" name="comment-body" placeholder="Your comments"></textarea>
+            </div>
+                <div class="panel-body">
+                <button class="btn btn-default hvr-fade" type="submit">Add</button>
+            </div>
+</form>
+                </div>
+            </div>
+          </div>
+        </div>
+
+    {% endifequal %}
+
+
+  </div>
+</div>
+
+<!-- footer -->
+{% include "landing_page/footer.html" %}
+<!-- /footer -->
+
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/flick/jquery-ui.css">
+
+
+<!-- CSS and JavaScript for django-todo -->
+<script type="text/javascript" charset="utf-8">
+    // thedate.x comes from the edit_task view. If this is a new entry,
+    // thedate won't be present and datepicker will fall back on the default (today).
+    $(document).ready(function(){
+        $('#id_due_date').datepicker({ dateFormat: 'dd/mm/yy' });
+     });
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        // Initially hide the TaskEdit form
+        $('#TaskEdit').hide();
+        // toggle slide to show the Add Task form when link clicked
+        $('#slideToggle').click(function(){
+            $(this).siblings('#TaskEdit').slideToggle();
+        });
+    });
+</script>
+
+{% endblock %}

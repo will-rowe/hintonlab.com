@@ -1,0 +1,34 @@
+# original requirements
+Django==1.9
+gunicorn==19.3.0
+psycopg2==2.6
+redis==2.10.3
+
+#
+requests==2.9.1
+image==1.4.4
+
+# for s3 integration
+boto==2.39.0
+django-storages==1.4
+
+# for displaying photos
+django-taggit==0.18.0
+sorl-thumbnail==12.4a1
+django_widget_tweaks==1.4.1
+django-braces==1.8.1
+
+# for todo lists and sending emails
+#django-todo==1.6
+sendgrid-django==1.4.0
+
+# for data import/export
+django-import-export==0.4.5
+tablib==0.11.2
+
+# for site-wide searching
+django-reversion==1.10.0
+django-watson==1.2.1
+
+# for publications page
+pubmed-lookup==0.2.1

@@ -1,0 +1,106 @@
+{% extends "landing_page/_base.html" %}
+{% block pagename %}NEWS-post_detail{% endblock %}
+{% load static from staticfiles %}
+{% load thumbnail %}
+
+{% block scripts %}
+<script id="dsq-count-scr" src="//hintonlab.disqus.com/count.js" type="text/javascript" async></script>
+<script>
+  var disqus_config = function () {
+  this.page.url = 'http://' + '{{ domain }}' + '/news/post/' + {{ post.pk }};
+  this.page.identifier = 'http://' + '{{ domain }}' + '/news/post/' + {{ post.pk }};
+  };
+  (function() {
+  var d = document, s = d.createElement('script');
+  s.src = '//hintonlab.disqus.com/embed.js';
+  s.setAttribute('data-timestamp', +new Date());
+  (d.head || d.body).appendChild(s);
+  })();
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+<!--- Post --->
+      <div id="news-content" class="col-md-8">
+          <hr/>
+          {% if post.published_date %}
+            <div class="date">{{ post.published_date }}</div>
+          {% endif %}
+          {% if user.is_authenticated %}<a class="btn btn-default btn-xs hvr-fade" href="{% url 'post_edit' pk=post.pk %}">Edit this post <span class="glyphicon glyphicon-pencil"></span></a>{% endif %}
+            <h2>{{ post.title }}</h2>
+            <hr/>
+            {% if post.picture_orientation == 'P' %}
+              {% thumbnail post.picture "400x600" crop="center" as im %}
+                  <a href="{{ post.picture.url}}" target="_blank"><img class="img-responsive img-rounded center-block" src="{{ im.url }}" alt="http://placehold.it/400x600"></a>
+              {% endthumbnail %}
+            {% endif %}
+            {% if post.picture_orientation == 'L' %}
+              {% thumbnail post.picture "600x400" crop="center" as im %}
+                  <a href="{{ post.picture.url}}" target="_blank"><img class="img-responsive img-rounded center-block" src="{{ im.url }}" alt="http://placehold.it/600x400"></a>
+              {% endthumbnail %}
+            {% endif %}
+            <hr/>
+            <small class="text-muted">{{ post.picture_caption }}</small>
+            <hr/>
+            <p>{{ post.text|safe|urlize|linebreaks }}</p>
+            <div id="disqus_thread"></div>
+<!--- ./ Post --->
+      </div>
+
+
+      <!--- Side Bar --->
+            <div id="news-sidebar" class="col-md-4">
+                  <!--- search --->
+                  <div class="widget wid-search">
+                    <div class="heading"><h4>Search</h4></div>
+                      <div class="content">
+                        <form id="custom-search-form" class="form-search form-horizontal pull-right" action="{% url 'news_search' %}" method="get">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Search news . . ." name="q" value="{{request.GET.q}}">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="submit" value="search">
+                                        <span class="glyphicon glyphicon-search"></span>
+                                </button>
+                                </span>
+                            </div>
+                        </form>
+                      </div>
+                  <!--- ./ search --->
+                  </div>
+                  <!--- category --->
+                  <div class="widget wid-category">
+                    <div class="heading"><h4>Categories</h4></div>
+                    <div class="content text-center">
+                        <div class="col-xs-3">
+                          <a class="btn btn-default btn-md hvr-fade" role="button" href="{% url 'lab_news' %}">Lab</a>
+                        </div>
+                        <div class="col-xs-3">
+                          <a class="btn btn-default btn-md hvr-fade" role="button" href="{% url 'social_news' %}">Social</a>
+                        </div>
+                        <div class="col-xs-3">
+                          <a class="btn btn-default btn-md hvr-fade" role="button" href="{% url 'other_news' %}">Other</a>
+                        </div>
+                        <div class="col-xs-3">
+                          <a class="btn btn-default btn-md hvr-fade" role="button" href="{% url 'news' %}">All</a>
+                        </div>
+                    </div>
+                  <!--- ./ categories --->
+                  </div>
+                  <!--- twitter --->
+                  <div class="widget wid-about">
+                    <div class="heading"><h4>Connect</h4></div>
+                    <div class="content">
+                      <a class="twitter-timeline" href="https://twitter.com/jay_salsa" data-widget-id="722041337470705664"></a>
+                      <div class="addthis_horizontal_follow_toolbox"></div>
+                    </div>
+                    <!--- ./ twitter --->
+                  </div>
+      <!--- ./ Side Bar --->
+            </div>
+          </div>
+          <hr>
+      </div>
+
+{% endblock content %}

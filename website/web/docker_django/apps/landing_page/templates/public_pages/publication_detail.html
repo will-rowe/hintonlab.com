@@ -1,0 +1,33 @@
+{% extends "landing_page/_base.html" %}
+{% block pagename %}PUBLICATION-DETAIL{% endblock %}
+{% load static from staticfiles %}
+{% load thumbnail %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+              <h1 style="color:#D9853B">{{ publication.title }}</h1>
+              <hr class="featurette-divider">
+              {% if publication.picture %}
+              {% thumbnail publication.picture "600x600" crop="center" as im %}
+                  <a href="{{ im.url }}" target="_blank"><img class="img-responsive img-rounded center-block" src="{{ im.url }}" alt="http://placehold.it/600x600"></a>
+                  <hr class="featurette-divider">
+              {% endthumbnail %}
+              {% endif %}
+              <h4>Authors:</h4>
+              <p>{{ publication.authors }}</p>
+              <h4>Journal:</h4>
+              <p>{{ publication.journal }}</p>
+              <h4>Abstract:</h4>
+              <p>{{ publication.abstract }}</p>
+              <hr class="featurette-divider">
+              <a {% if publication.pdf %} class="btn btn-primary" data-toggle="tooltip" title="Download" href="{{ publication.pdf.url }}" target="_blank"> Download paper <span class="glyphicon glyphicon-arrow-down"></span>{% else %}class="btn btn-disabled" data-toggle="tooltip"> No paper available!</a>{% endif %}{% if user.is_authenticated %}<a class="btn btn-danger pull-right" data-toggle="tooltip" title="Delete" href="{% url 'remove_publication' pk=publication.pk %}"><span class="glyphicon glyphicon-remove"></span> Delete Entry</a><a class="btn btn-warning pull-right" data-toggle="tooltip" title="Edit" href="{% url 'edit_publication' pk=publication.pk %}"><span class="glyphicon glyphicon-erase"></span> Edit Entry</a>{% endif %}<a class="btn btn-success pull-right" data-toggle="tooltip" title="Go back" href="{% url 'publications' %}"><span class="glyphicon glyphicon-menu-left"></span> Go Back</a>
+              <hr class="featurette-divider">
+        </div>
+    </div>
+
+<!-- footer -->
+{% include "landing_page/footer.html" %}
+<!-- /footer -->
+
+{% endblock %}

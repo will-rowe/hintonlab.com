@@ -1,0 +1,50 @@
+{% extends "landing_page/_base.html" %}
+{% block pagename %}NEWS-edit_post_detail{% endblock %}
+
+{% block content %}
+    <!-- Content -->
+    <div class="content-section-a">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-2">
+          </div>
+          <div class="col-lg-8 text-center">
+            <div class="panel panel-primary">
+                <div class="content-box-header panel-heading">
+                    <h3 class="panel-title"><i class="fa fa-magnet"></i> New Post</h3>
+                </div>
+                <div class="panel-body">
+
+                  <FORM id="post_new" method="post" action="" enctype="multipart/form-data">{% csrf_token %}
+                       <table class="table">
+                         {{ form.errors }}
+                         {{ form.non_field_errors }}
+                          <tr>
+                              <th>Title:</th>
+                              <td>{{ form.title }}</td>
+                          </tr>
+                          <tr>
+                              <th>Category:</th>
+                              <td>{{ form.category }}</td>
+                          </tr>
+                          <tr>
+                              <th>Picture:</th>
+                              <td>{{ form.picture }}</td>
+                          </tr>
+                          <tr>
+                              <th>Text:</th>
+                              <td>{{ form.text }}</td>
+                          </tr>
+                       </table>
+                     <p><input type="submit" name="submit" value="Submit Post!" class="btn btn-default btn-md pull-center hvr-fade"></p>
+                     <note>This post will be flagged for publication and will show on the website shortly.</note>
+                   </FORM>
+
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+{% endblock %}

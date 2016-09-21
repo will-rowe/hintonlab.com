@@ -1,0 +1,21 @@
+{% extends "landing_page/_base.html" %}
+{% block content %}
+
+        <div class="container">
+            <div class="row">
+              <h2>Edit entry{% if user.is_authenticated %}<a class="btn btn-danger pull-right" data-toggle="tooltip" title="Delete" href="{% url 'remove_publication' pk=publication.pk %}"><span class="glyphicon glyphicon-remove"></span> Delete entry</a>{% endif %}<a class="btn btn-success pull-right" data-toggle="tooltip" title="Go back" href="{% url 'publications' %}"><span class="glyphicon glyphicon-menu-left"></span> Go Back</a></h2>
+              <form method="POST" class="post-form" enctype="multipart/form-data">{% csrf_token %}
+                  <table>
+                    {% for field in form %}
+                    <tr>
+                        <td>{{ field.label_tag }}</td>
+                        <td>{{ field }}</td>
+                    </tr>
+                    {% endfor %}
+                  </table>
+                  <div class="form-group"><button type="submit" class="btn btn-success">Save!</button></div>
+              </form>
+            </div>
+        </div>
+
+{% endblock %}

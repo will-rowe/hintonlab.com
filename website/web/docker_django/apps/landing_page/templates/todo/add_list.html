@@ -1,0 +1,57 @@
+{% extends "landing_page/_base.html" %}
+{% load static from staticfiles %}
+
+{% block content %}
+<!-- Header -->
+<header id="heading" class="pad-section">
+  <div class="container text-center">
+				<h1>Add a task list</h1>
+  </div>
+</header>
+<!-- /Header-->
+
+<!-- Content -->
+<div class="content-section-b">
+  <div class="container">
+
+		<!-- Site messages (for todo lists) -->
+    {% if messages %}
+        {% for message in messages %}
+          <div {% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %}>
+              <a href="#" class="close" data-dismiss="alert">&times;</a>
+              <strong>{{ message }}</strong>
+          </div>
+        {% endfor %}
+    {% endif %}
+
+
+	<form action="" method="post">
+		{% csrf_token %}
+
+    <table class="table">
+      {% if form.errors %}
+      <p><strong>Submission error:</strong></p>
+      <p>{{form.errors}}</p>
+      {% endif %}
+       <tr>
+           <td><label for="id_title">Task list name:</label> {{ form.name }}</td>
+       </tr>
+       <tr>
+           <td><label for="id_due_date">Due date:</label> {{ form.group }}</td>
+       </tr>
+
+    </table>
+    <p><input type="submit" name="add_task_list" value="Create list!" class="btn btn-default btn-md pull-center hvr-fade"></p>
+
+	<hr>
+	<p><a href="{% url 'todo-lists' %}">Back to task lists</a></p>
+
+	</div>
+</div>
+
+
+
+<!-- footer -->
+{% include "landing_page/footer.html" %}
+<!-- /footer -->
+{% endblock %}

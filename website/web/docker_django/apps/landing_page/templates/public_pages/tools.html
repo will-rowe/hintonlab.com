@@ -1,0 +1,80 @@
+{% extends "landing_page/_base.html" %}
+{% load cache %}
+{% block pagename %}TOOLS{% endblock %}
+{% load static from staticfiles %}
+{% load thumbnail %}
+
+{% block content %}
+{% cache 60 tools_html %}
+<!-- first section -->
+<header id="heading" class="pad-section">
+  <div class="container text-center">
+    <h1>Resources</h1>
+    <h4 class="hidden-xs">A selection of the tools and resources that we use</h4>
+  </div>
+  <a class="arrow-wrap" style="cursor: pointer; cursor: hand;" onclick="$('#team-profiles').animatescroll({scrollSpeed:2000,easing:'easeInOutBack'});"><span class="arrow"></span></a>
+</header>
+<!-- /first section -->
+
+
+
+<!-- second section - Tools -->
+<div id="tools" class="content-section-b">
+  <div class="container text-center">
+    <div class="row">
+      {% for tool in tools %}
+      {% thumbnail tool.picture "450x300" crop="center" as im %}
+        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 nopadding">
+            <div class="hovereffect">
+                <img class="img-responsive" src="{{ im.url }}" alt="img">
+                <div class="overlay">
+                   <h2>{{ tool.title }}</h2>
+                   <a class="info" data-toggle="modal" data-target="#{{ tool.pk }}" style="cursor: pointer; cursor: hand;">View details</a>
+                </div>
+            </div>
+        </div>
+      {% endthumbnail %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+<!-- /second section -->
+
+<!-- footer -->
+{% include "landing_page/footer.html" %}
+<!-- /footer -->
+
+{% endcache %}
+{% endblock content %}
+
+{% block modal %}
+<!-- TOOL MODAL -->
+{% for tool in tools %}
+<div id="{{ tool.pk }}" class="modal fade">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h2 class="modal-title" style="color: #558C89;">{{ tool.title }}</h2>
+        </div>
+        <div class="modal-body">
+              <div class="col-md-6">
+                <h3>Details</h3>
+                <well>{{ tool.text|safe|urlize|linebreaks }}</well>
+              </div>
+              <div class="col-md-6 text-center">
+                {% thumbnail tool.picture "300x300" crop="center" as im %}
+                <img class="img-responsive center-block" src="{{ im.url }}" alt="img">
+                {% endthumbnail %}
+                <hr/>
+                <p><a href="{{ tool.link }}" target="_blank">More information</a></p>
+              </div>
+            <hr/>
+        </div>
+    </div>
+  </div>
+</div>
+<!-- /.TOOL MODAL-->
+{% endfor %}
+
+{% endblock modal %}

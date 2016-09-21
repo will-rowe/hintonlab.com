@@ -1,0 +1,27 @@
+{% extends "landing_page/_base.html" %}
+{% load static from staticfiles %}
+{% block content %}
+
+<!-- Content -->
+<div class="content-section-b">
+    <div class="container">
+            <div class='myIframe' >
+              <!--
+              <iframe src="/jbrowse-source/index.html?data=sample_data%2Fjson%2Fvolvox&loc=ctgA%3A26926..32949&tracks=DNA%2CTranscript%2Cvolvox_microarray_bw_density%2Cvolvox_microarray_bw_xyplot%2Cvolvox-sorted-vcf%2Cvolvox-sorted_bam_coverage%2Cvolvox-sorted_bam&highlight=" sandbox="allow-same-origin allow-scripts">
+                  <p><a href="https://developer.mozilla.org/en-US/docs/Glossary">Fallback link for browsers that don't support iframes</a></p>
+              </iframe>
+              -->
+
+              <iframe src="/jbrowse-source/index.html?data=00_SAMPLES/rocio-2016/data" sandbox="allow-same-origin allow-scripts">
+                  <p><a href="https://developer.mozilla.org/en-US/docs/Glossary">Fallback link for browsers that don't support iframes</a></p>
+              </iframe>
+
+            </div>
+    </div>
+    <!-- /.container -->
+</div>
+<!-- /.content-section-a -->
+
+
+
+{% endblock content %}

@@ -1,0 +1,73 @@
+{% extends "landing_page/_base.html" %}
+{% block pagename %}ANALYSIS{% endblock %}
+{% load static from staticfiles %}
+
+{% block content %}
+      <!-- messages -->
+      {% if message %}
+      <div class="alert alert-danger" role="alert">
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        {{ message | safe }}
+      </div>
+      {% endif %}
+       <!-- /messages -->
+
+
+<!-- Header -->
+<header id="heading" class="pad-section">
+  <div class="container text-center">
+    <h1>Analysis</h1>
+    <h4 class="hidden-xs">An archive for bioinformatic reports and analysis</h4>
+  </div>
+  <a class="arrow-wrap" style="cursor: pointer; cursor: hand;" onclick="$('#db-table').animatescroll({scrollSpeed:2000,easing:'easeInOutBack'});"><span class="arrow"></span></a>
+</header>
+<!-- /Header-->
+
+<!-- Publications -->
+<div id="db-table" class="content-section-b">
+    <div class="container">
+        <div class="row">
+            <table class="sortable table table-hover">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Requester</th>
+                  <th>Upload date</th>
+                  <th>Completed?</th>
+                  <th>Archived? <sup>*</sup></th>
+                  <th>Link</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for job in jobs %}
+                <tr>
+                  <td>{{ job.title }}</td>
+                  <td>{{ job.end_user }}</td>
+                  <td>{{ job.created_date }}</td>
+                  <td>{% if job.completed %}<a><span class="glyphicon glyphicon-ok"></span></a>{% else %}<a><span class="glyphicon glyphicon-remove"></span></a>{% endif %}</td>
+                  <td>{% if job.archived %}<a><span class="glyphicon glyphicon-ok"></span></a>{% else %}<a><span class="glyphicon glyphicon-remove"></span></a>{% endif %}</td>
+                  <td>{% if job.link %}<a href="{{ job.link }}" target="_blank" title="Go to project" class="btn btn-default btn-xs hvr-fade" role="button">View <span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span></a>{% else %}<a class="btn btn-default btn-xs disabled" role="button">Offline</a>{% endif %}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+        </div>
+
+        <div class="row">
+          <p><small><sup>*</sup> If a project has been archived, it is no longer hosted in an AWS S3 bucket and is not online - please ask for it to be re-uploaded if you want to view it.</small></p>
+        </div>
+
+
+    </div>
+    <!-- /.container -->
+</div>
+<!-- /Publications-->
+
+
+
+<!-- footer -->
+{% include "landing_page/footer.html" %}
+<!-- /footer -->
+
+
+{% endblock content %}
